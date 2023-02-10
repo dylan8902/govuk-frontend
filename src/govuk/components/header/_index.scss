@@ -1,12 +1,29 @@
 @include govuk-exports("govuk/component/header") {
 
-  $govuk-header-background: govuk-colour("black");
+  $govuk-header-background: govuk-colour("dark-blue");
   $govuk-header-border-color: $govuk-brand-colour;
   $govuk-header-border-width: govuk-spacing(2);
   $govuk-header-text: govuk-colour("white");
-  $govuk-header-link-active: #1d8feb;
+  $govuk-header-link-active: govuk-colour("white");
   $govuk-header-nav-item-border-color: #2e3133;
   $govuk-header-link-underline-thickness: 3px;
+
+  .nrw-header {
+    padding-top: govuk-spacing(1);
+    padding-bottom: govuk-spacing(1);
+    background-color: govuk-colour("white");
+
+    svg {
+      height: 45px;
+    }
+  }
+
+  .nrw-header__container {
+    @include govuk-clearfix;
+    position: relative;
+    padding-top: govuk-spacing(2);
+    padding-bottom: govuk-spacing(2);
+  }
 
   .govuk-header {
     @include govuk-font($size: 16);
@@ -14,6 +31,10 @@
     border-bottom: govuk-spacing(2) solid govuk-colour("white");
     color: $govuk-header-text;
     background: $govuk-header-background;
+    background-image: url("/assets/images/waves-bg-cropped.svg");
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-size: 24%;
   }
 
   .govuk-header__container--full-width {
@@ -28,9 +49,8 @@
   .govuk-header__container {
     @include govuk-clearfix;
     position: relative;
-    margin-bottom: -$govuk-header-border-width;
-    padding-top: govuk-spacing(2);
-    border-bottom: $govuk-header-border-width solid $govuk-header-border-color;
+    padding-top: govuk-spacing(6);
+    padding-bottom: govuk-spacing(6);
   }
 
   .govuk-header__logotype {
