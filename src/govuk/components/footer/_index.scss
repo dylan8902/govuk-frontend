@@ -5,7 +5,7 @@
   // This variable can be removed entirely once the legacy palette goes away,
   // as it'll just be the same as $govuk-footer-border.
   $govuk-footer-border-top: $govuk-border-colour;
-  $govuk-footer-text: $govuk-text-colour;
+  $govuk-footer-text: govuk-colour("white");
   $govuk-footer-link-hover-colour: null; // Only used with the legacy palette
 
   @if $govuk-use-legacy-palette {
@@ -35,18 +35,14 @@
   .govuk-footer__link {
     @include govuk-link-common;
 
-    @if $govuk-use-legacy-palette {
-      &:link,
-      &:visited {
-        color: $govuk-footer-text;
-      }
+    &:link,
+    &:visited {
+      color: $govuk-footer-text;
+    }
 
-      &:hover,
-      &:active {
-        color: $govuk-footer-link-hover-colour;
-      }
-    } @else {
-      @include govuk-link-style-text;
+    &:hover,
+    &:active {
+      color: $govuk-footer-link-hover-colour;
     }
 
     // alphagov/govuk_template includes a specific a:link:focus selector
@@ -102,21 +98,6 @@
 
   .govuk-footer__licence-description {
     display: inline-block;
-  }
-
-  .govuk-footer__copyright-logo {
-    display: inline-block;
-    min-width: $govuk-footer-crest-image-width;
-    padding-top: ($govuk-footer-crest-image-height + govuk-spacing(2));
-    background-image: govuk-image-url("govuk-crest.png");
-    @include govuk-device-pixel-ratio {
-      background-image: govuk-image-url("govuk-crest-2x.png");
-    }
-    background-repeat: no-repeat;
-    background-position: 50% 0%;
-    background-size: $govuk-footer-crest-image-width $govuk-footer-crest-image-height;
-    text-align: center;
-    white-space: nowrap;
   }
 
   .govuk-footer__inline-list {

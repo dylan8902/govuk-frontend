@@ -30,7 +30,7 @@ $govuk-text-colour: govuk-colour("black") !default;
 /// @type Colour
 /// @access public
 
-$govuk-canvas-background-colour: govuk-colour("light-grey", $legacy: "grey-3") !default;
+$govuk-canvas-background-colour: govuk-colour("dark-grey", $legacy: "grey-3") !default;
 
 /// Body background colour
 ///
