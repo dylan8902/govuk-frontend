@@ -344,7 +344,7 @@
 
 	  // Empty / whitespace-only strings are considered finite so we need to check
 	  // the length of the trimmed string as well
-	  if (trimmedValue.length > 0 && isFinite(trimmedValue)) {
+	  if (trimmedValue.length > 0 && isFinite(Number(trimmedValue))) {
 	    return Number(trimmedValue)
 	  }
 
@@ -360,6 +360,7 @@
 	 * @returns {Object<string, unknown>} Normalised dataset
 	 */
 	function normaliseDataset (dataset) {
+	  /** @type {Object<string, unknown>} */
 	  var out = {};
 
 	  for (var key in dataset) {

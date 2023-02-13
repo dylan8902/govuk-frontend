@@ -30,7 +30,7 @@ $govuk-text-colour: govuk-colour("black") !default;
 /// @type Colour
 /// @access public
 
-$govuk-canvas-background-colour: govuk-colour("light-grey", $legacy: "grey-3") !default;
+$govuk-canvas-background-colour: govuk-colour("dark-grey", $legacy: "grey-3") !default;
 
 /// Body background colour
 ///
@@ -138,7 +138,7 @@ $govuk-link-colour: govuk-colour("blue") !default;
 /// @type Colour
 /// @access public
 
-$govuk-link-visited-colour: govuk-colour("purple", $legacy: #4c2c92) !default;
+$govuk-link-visited-colour: govuk-colour("blue", $legacy: #4c2c92) !default;
 
 /// Link hover colour
 ///
@@ -152,4 +152,4 @@ $govuk-link-hover-colour: govuk-colour("dark-blue", $legacy: "light-blue") !defa
 /// @type Colour
 /// @access public
 
-$govuk-link-active-colour: govuk-colour("black", $legacy: "light-blue") !default;
+$govuk-link-active-colour: govuk-colour("blue", $legacy: "light-blue") !default;

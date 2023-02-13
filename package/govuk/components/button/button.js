@@ -35,6 +35,7 @@
      */
     var flattenObject = function (configObject) {
       // Prepare an empty return object
+      /** @type {Object<string, unknown>} */
       var flattenedObject = {};
 
       /**
@@ -71,6 +72,7 @@
     };
 
     // Start with an empty object as our base
+    /** @type {Object<string, unknown>} */
     var formattedConfigObject = {};
 
     // Loop through each of the remaining passed objects and push their keys
@@ -89,10 +91,11 @@
   }
 
   /**
+   * @template {Node} ElementType
    * @callback nodeListIterator
-   * @param {Element} value - The current node being iterated on
+   * @param {ElementType} value - The current node being iterated on
    * @param {number} index - The current index in the iteration
-   * @param {NodeListOf<Element>} nodes - NodeList from querySelectorAll()
+   * @param {NodeListOf<ElementType>} nodes - NodeList from querySelectorAll()
    * @returns {void}
    */
 
@@ -436,7 +439,7 @@
 
     // Empty / whitespace-only strings are considered finite so we need to check
     // the length of the trimmed string as well
-    if (trimmedValue.length > 0 && isFinite(trimmedValue)) {
+    if (trimmedValue.length > 0 && isFinite(Number(trimmedValue))) {
       return Number(trimmedValue)
     }
 
@@ -452,6 +455,7 @@
    * @returns {Object<string, unknown>} Normalised dataset
    */
   function normaliseDataset (dataset) {
+    /** @type {Object<string, unknown>} */
     var out = {};
 
     for (var key in dataset) {
@@ -898,11 +902,11 @@
    * JavaScript enhancements for the Button component
    *
    * @class
-   * @param {HTMLElement} $module - HTML element to use for button
+   * @param {Element} $module - HTML element to use for button
    * @param {ButtonConfig} [config] - Button config
    */
   function Button ($module, config) {
-    if (!$module) {
+    if (!($module instanceof HTMLElement)) {
       return this
     }
 
@@ -912,6 +916,8 @@
     var defaultConfig = {
       preventDoubleClick: false
     };
+
+    /** @type {ButtonConfig} */
     this.config = mergeConfigs(
       defaultConfig,
       config || {},
@@ -923,6 +929,7 @@
    * Initialise component
    */
   Button.prototype.init = function () {
+    // Check that required elements are present
     if (!this.$module) {
       return
     }
@@ -944,7 +951,13 @@
   Button.prototype.handleKeyDown = function (event) {
     var $target = event.target;
 
-    if ($target.getAttribute('role') === 'button' && event.keyCode === KEY_SPACE) {
+    // Handle space bar only
+    if (event.keyCode !== KEY_SPACE) {
+      return
+    }
+
+    // Handle elements with [role="button"] only
+    if ($target instanceof HTMLElement && $target.getAttribute('role') === 'button') {
       event.preventDefault(); // prevent the page from scrolling
       $target.click();
     }
@@ -981,9 +994,8 @@
    * Button config
    *
    * @typedef {object} ButtonConfig
-   * @property {boolean} [preventDoubleClick = false] -
-   *  Prevent accidental double clicks on submit buttons from submitting forms
-   *  multiple times.
+   * @property {boolean} [preventDoubleClick = false] - Prevent accidental double
+   *   clicks on submit buttons from submitting forms multiple times.
    */
 
   return Button;

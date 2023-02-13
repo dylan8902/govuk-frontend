@@ -665,11 +665,15 @@
 	 * Header component
 	 *
 	 * @class
-	 * @param {HTMLElement} $module - HTML element to use for header
+	 * @param {Element} $module - HTML element to use for header
 	 */
 	function Header ($module) {
+	  if (!($module instanceof HTMLElement)) {
+	    return this
+	  }
+
 	  this.$module = $module;
-	  this.$menuButton = $module && $module.querySelector('.govuk-js-header-toggle');
+	  this.$menuButton = $module.querySelector('.govuk-js-header-toggle');
 	  this.$menu = this.$menuButton && $module.querySelector(
 	    '#' + this.$menuButton.getAttribute('aria-controls')
 	  );
@@ -697,6 +701,7 @@
 	 * version of the menu to the user.
 	 */
 	Header.prototype.init = function () {
+	  // Check that required elements are present
 	  if (!this.$module || !this.$menuButton || !this.$menu) {
 	    return
 	  }
@@ -705,14 +710,14 @@
 	    // Set the matchMedia to the govuk-frontend desktop breakpoint
 	    this.mql = window.matchMedia('(min-width: 48.0625em)');
 
-	    if ('addEventListener' in this.mql) {
-	      this.mql.addEventListener('change', this.syncState.bind(this));
-	    } else {
-	      // addListener is a deprecated function, however addEventListener
-	      // isn't supported by IE or Safari. We therefore add this in as
-	      // a fallback for those browsers
-	      this.mql.addListener(this.syncState.bind(this));
-	    }
+	    var listenerMethod = 'addEventListener' in this.mql
+	      ? 'addEventListener'
+	      : 'addListener';
+
+	    // addListener is a deprecated function, however addEventListener
+	    // isn't supported by IE or Safari. We therefore add this in as
+	    // a fallback for those browsers
+	    this.mql[listenerMethod]('change', this.syncState.bind(this));
 
 	    this.syncState();
 	    this.$menuButton.addEventListener('click', this.handleMenuButtonClick.bind(this));
@@ -735,7 +740,7 @@
 	    this.$menuButton.setAttribute('hidden', '');
 	  } else {
 	    this.$menuButton.removeAttribute('hidden');
-	    this.$menuButton.setAttribute('aria-expanded', this.menuIsOpen);
+	    this.$menuButton.setAttribute('aria-expanded', this.menuIsOpen.toString());
 
 	    if (this.menuIsOpen) {
 	      this.$menu.removeAttribute('hidden');

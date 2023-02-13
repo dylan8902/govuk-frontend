@@ -23,10 +23,10 @@ $govuk-button-text-colour: govuk-colour("white") !default;
   $govuk-button-text-colour: $govuk-button-text-colour;
 
   // Secondary button variables
-  $govuk-secondary-button-colour: govuk-colour("light-grey", $legacy: "grey-3");
+  $govuk-secondary-button-colour: govuk-colour("white", $legacy: "grey-3");
   $govuk-secondary-button-hover-colour: govuk-shade($govuk-secondary-button-colour, 10%);
   $govuk-secondary-button-shadow-colour: govuk-shade($govuk-secondary-button-colour, 40%);
-  $govuk-secondary-button-text-colour: govuk-colour("black");
+  $govuk-secondary-button-text-colour: govuk-colour("green");
 
   // Warning button variables
   $govuk-warning-button-colour: govuk-colour("red");
@@ -37,7 +37,7 @@ $govuk-button-text-colour: govuk-colour("white") !default;
   // Because the shadow (s0) is visually 'part of' the button, we need to reduce
   // the height of the button to compensate by adjusting its padding (s1) and
   // increase the bottom margin to include it (s2).
-  $button-shadow-size: $govuk-border-width-form-element;
+  $button-shadow-size: 0;
 
   .govuk-button {
     @include govuk-font($size: 19, $line-height: 19px);
@@ -50,20 +50,15 @@ $govuk-button-text-colour: govuk-colour("white") !default;
     margin-right: 0;
     margin-left: 0;
     @include govuk-responsive-margin(6, "bottom", $adjustment: $button-shadow-size); // s2
-    padding: (govuk-spacing(2) - $govuk-border-width-form-element) govuk-spacing(2) (govuk-spacing(2) - $govuk-border-width-form-element - ($button-shadow-size / 2)); // s1
+    padding: (govuk-spacing(3) - $govuk-border-width-form-element) govuk-spacing(3) (govuk-spacing(3) - $govuk-border-width-form-element - ($button-shadow-size / 2)); // s1
     border: $govuk-border-width-form-element solid transparent;
-    border-radius: 0;
+    border-radius: 3px;
     color: $govuk-button-text-colour;
     background-color: $govuk-button-colour;
-    box-shadow: 0 $button-shadow-size 0 $govuk-button-shadow-colour; // s0
     text-align: center;
     vertical-align: top;
     cursor: pointer;
     -webkit-appearance: none;
-
-    @include govuk-if-ie8 {
-      border-bottom: $button-shadow-size solid $govuk-button-shadow-colour;
-    }
 
     @include govuk-media-query($from: tablet) {
       width: auto;
@@ -186,8 +181,10 @@ $govuk-button-text-colour: govuk-colour("white") !default;
   }
 
   .govuk-button--secondary {
+    border: 1px solid $govuk-secondary-button-text-colour;
     background-color: $govuk-secondary-button-colour;
     box-shadow: 0 $button-shadow-size 0 $govuk-secondary-button-shadow-colour;
+    font-weight: bold;
 
     &,
     &:link,

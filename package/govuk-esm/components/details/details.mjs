@@ -17,9 +17,13 @@ var KEY_SPACE = 32
  * Details component
  *
  * @class
- * @param {HTMLElement} $module - HTML element to use for details
+ * @param {Element} $module - HTML element to use for details
  */
 function Details ($module) {
+  if (!($module instanceof HTMLElement)) {
+    return this
+  }
+
   this.$module = $module
 }
 
@@ -27,18 +31,18 @@ function Details ($module) {
  * Initialise component
  */
 Details.prototype.init = function () {
+  // Check that required elements are present
   if (!this.$module) {
     return
   }
 
   // If there is native details support, we want to avoid running code to polyfill native behaviour.
-  var hasNativeDetails = typeof this.$module.open === 'boolean'
+  var hasNativeDetails = 'HTMLDetailsElement' in window &&
+    this.$module instanceof HTMLDetailsElement
 
-  if (hasNativeDetails) {
-    return
+  if (!hasNativeDetails) {
+    this.polyfillDetails()
   }
-
-  this.polyfillDetails()
 }
 
 /**
@@ -119,7 +123,7 @@ Details.prototype.polyfillHandleInputs = function (callback) {
     var $target = event.target
     // When the key gets pressed - check if it is enter or space
     if (event.keyCode === KEY_ENTER || event.keyCode === KEY_SPACE) {
-      if ($target.nodeName.toLowerCase() === 'summary') {
+      if ($target instanceof HTMLElement && $target.nodeName.toLowerCase() === 'summary') {
         // Prevent space from scrolling the page
         // and enter from submitting a form
         event.preventDefault()
@@ -138,7 +142,7 @@ Details.prototype.polyfillHandleInputs = function (callback) {
   this.$summary.addEventListener('keyup', function (event) {
     var $target = event.target
     if (event.keyCode === KEY_SPACE) {
-      if ($target.nodeName.toLowerCase() === 'summary') {
+      if ($target instanceof HTMLElement && $target.nodeName.toLowerCase() === 'summary') {
         event.preventDefault()
       }
     }

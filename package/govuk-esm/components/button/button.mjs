@@ -12,11 +12,11 @@ var DEBOUNCE_TIMEOUT_IN_SECONDS = 1
  * JavaScript enhancements for the Button component
  *
  * @class
- * @param {HTMLElement} $module - HTML element to use for button
+ * @param {Element} $module - HTML element to use for button
  * @param {ButtonConfig} [config] - Button config
  */
 function Button ($module, config) {
-  if (!$module) {
+  if (!($module instanceof HTMLElement)) {
     return this
   }
 
@@ -26,6 +26,8 @@ function Button ($module, config) {
   var defaultConfig = {
     preventDoubleClick: false
   }
+
+  /** @type {ButtonConfig} */
   this.config = mergeConfigs(
     defaultConfig,
     config || {},
@@ -37,6 +39,7 @@ function Button ($module, config) {
  * Initialise component
  */
 Button.prototype.init = function () {
+  // Check that required elements are present
   if (!this.$module) {
     return
   }
@@ -58,7 +61,13 @@ Button.prototype.init = function () {
 Button.prototype.handleKeyDown = function (event) {
   var $target = event.target
 
-  if ($target.getAttribute('role') === 'button' && event.keyCode === KEY_SPACE) {
+  // Handle space bar only
+  if (event.keyCode !== KEY_SPACE) {
+    return
+  }
+
+  // Handle elements with [role="button"] only
+  if ($target instanceof HTMLElement && $target.getAttribute('role') === 'button') {
     event.preventDefault() // prevent the page from scrolling
     $target.click()
   }
@@ -97,7 +106,6 @@ export default Button
  * Button config
  *
  * @typedef {object} ButtonConfig
- * @property {boolean} [preventDoubleClick = false] -
- *  Prevent accidental double clicks on submit buttons from submitting forms
- *  multiple times.
+ * @property {boolean} [preventDoubleClick = false] - Prevent accidental double
+ *   clicks on submit buttons from submitting forms multiple times.
  */

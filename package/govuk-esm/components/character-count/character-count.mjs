@@ -53,11 +53,16 @@ var CHARACTER_COUNT_TRANSLATIONS = {
  * of the available characters/words has been entered.
  *
  * @class
- * @param {HTMLElement} $module - HTML element to use for character count
+ * @param {Element} $module - HTML element to use for character count
  * @param {CharacterCountConfig} [config] - Character count config
  */
 function CharacterCount ($module, config) {
-  if (!$module) {
+  if (!($module instanceof HTMLElement)) {
+    return this
+  }
+
+  var $textarea = $module.querySelector('.govuk-js-character-count')
+  if (!($textarea instanceof HTMLTextAreaElement || $textarea instanceof HTMLInputElement)) {
     return this
   }
 
@@ -83,6 +88,7 @@ function CharacterCount ($module, config) {
     }
   }
 
+  /** @type {CharacterCountConfig} */
   this.config = mergeConfigs(
     defaultConfig,
     config || {},
@@ -96,19 +102,21 @@ function CharacterCount ($module, config) {
   })
 
   // Determine the limit attribute (characters or words)
-  if (this.config.maxwords) {
+  if ('maxwords' in this.config && this.config.maxwords) {
     this.maxLength = this.config.maxwords
-  } else if (this.config.maxlength) {
+  } else if ('maxlength' in this.config && this.config.maxlength) {
     this.maxLength = this.config.maxlength
   } else {
     return
   }
 
   this.$module = $module
-  this.$textarea = $module.querySelector('.govuk-js-character-count')
+  this.$textarea = $textarea
   this.$visibleCountMessage = null
   this.$screenReaderCountMessage = null
+
   this.lastInputTimestamp = null
+  this.lastInputValue = ''
 }
 
 /**
@@ -116,12 +124,15 @@ function CharacterCount ($module, config) {
  */
 CharacterCount.prototype.init = function () {
   // Check that required elements are present
-  if (!this.$textarea) {
+  if (!this.$module || !this.$textarea) {
     return
   }
 
   var $textarea = this.$textarea
   var $textareaDescription = document.getElementById($textarea.id + '-info')
+  if (!$textareaDescription) {
+    return
+  }
 
   // Inject a decription for the textarea if none is present already
   // for when the component was rendered with no maxlength, maxwords
@@ -164,11 +175,11 @@ CharacterCount.prototype.init = function () {
   // state of the character count is not restored until *after* the
   // DOMContentLoaded event is fired, so we need to manually update it after the
   // pageshow event in browsers that support it.
-  if ('onpageshow' in window) {
-    window.addEventListener('pageshow', this.updateCountMessage.bind(this))
-  } else {
-    window.addEventListener('DOMContentLoaded', this.updateCountMessage.bind(this))
-  }
+  window.addEventListener(
+    'onpageshow' in window ? 'pageshow' : 'DOMContentLoaded',
+    this.updateCountMessage.bind(this)
+  )
+
   this.updateCountMessage()
 }
 
@@ -233,9 +244,8 @@ CharacterCount.prototype.handleBlur = function () {
  * Update count message if textarea value has changed
  */
 CharacterCount.prototype.updateIfValueChanged = function () {
-  if (!this.$textarea.oldValue) this.$textarea.oldValue = ''
-  if (this.$textarea.value !== this.$textarea.oldValue) {
-    this.$textarea.oldValue = this.$textarea.value
+  if (this.$textarea.value !== this.lastInputValue) {
+    this.lastInputValue = this.$textarea.value
     this.updateCountMessage()
   }
 }
@@ -293,7 +303,7 @@ CharacterCount.prototype.updateScreenReaderCountMessage = function () {
   if (this.isOverThreshold()) {
     $screenReaderCountMessage.removeAttribute('aria-hidden')
   } else {
-    $screenReaderCountMessage.setAttribute('aria-hidden', true)
+    $screenReaderCountMessage.setAttribute('aria-hidden', 'true')
   }
 
   // Update message
@@ -308,7 +318,7 @@ CharacterCount.prototype.updateScreenReaderCountMessage = function () {
  * @returns {number} the number of characters (or words) in the text
  */
 CharacterCount.prototype.count = function (text) {
-  if (this.config.maxwords) {
+  if ('maxwords' in this.config && this.config.maxwords) {
     var tokens = text.match(/\S+/g) || [] // Matches consecutive non-whitespace chars
     return tokens.length
   } else {
@@ -324,7 +334,7 @@ CharacterCount.prototype.count = function (text) {
 CharacterCount.prototype.getCountMessage = function () {
   var remainingNumber = this.maxLength - this.count(this.$textarea.value)
 
-  var countType = this.config.maxwords ? 'words' : 'characters'
+  var countType = 'maxwords' in this.config && this.config.maxwords ? 'words' : 'characters'
   return this.formatCountMessage(remainingNumber, countType)
 }
 
@@ -386,10 +396,10 @@ export default CharacterCount
  *
  * @typedef {object} CharacterCountConfigWithMaxLength
  * @property {number} [maxlength] - The maximum number of characters.
- *  If maxwords is provided, the maxlength option will be ignored.
+ *   If maxwords is provided, the maxlength option will be ignored.
  * @property {number} [threshold = 0] - The percentage value of the limit at
- *  which point the count message is displayed. If this attribute is set, the
- *  count message will be hidden by default.
+ *   which point the count message is displayed. If this attribute is set, the
+ *   count message will be hidden by default.
  * @property {CharacterCountTranslations} [i18n = CHARACTER_COUNT_TRANSLATIONS] - See constant {@link CHARACTER_COUNT_TRANSLATIONS}
  */
 
@@ -398,10 +408,10 @@ export default CharacterCount
  *
  * @typedef {object} CharacterCountConfigWithMaxWords
  * @property {number} [maxwords] - The maximum number of words. If maxwords is
- *  provided, the maxlength option will be ignored.
+ *   provided, the maxlength option will be ignored.
  * @property {number} [threshold = 0] - The percentage value of the limit at
- *  which point the count message is displayed. If this attribute is set, the
- *  count message will be hidden by default.
+ *   which point the count message is displayed. If this attribute is set, the
+ *   count message will be hidden by default.
  * @property {CharacterCountTranslations} [i18n = CHARACTER_COUNT_TRANSLATIONS] - See constant {@link CHARACTER_COUNT_TRANSLATIONS}
  */
 

@@ -35,6 +35,7 @@
      */
     var flattenObject = function (configObject) {
       // Prepare an empty return object
+      /** @type {Object<string, unknown>} */
       var flattenedObject = {};
 
       /**
@@ -71,6 +72,7 @@
     };
 
     // Start with an empty object as our base
+    /** @type {Object<string, unknown>} */
     var formattedConfigObject = {};
 
     // Loop through each of the remaining passed objects and push their keys
@@ -89,10 +91,11 @@
   }
 
   /**
+   * @template {Node} ElementType
    * @callback nodeListIterator
-   * @param {Element} value - The current node being iterated on
+   * @param {ElementType} value - The current node being iterated on
    * @param {number} index - The current index in the iteration
-   * @param {NodeListOf<Element>} nodes - NodeList from querySelectorAll()
+   * @param {NodeListOf<ElementType>} nodes - NodeList from querySelectorAll()
    * @returns {void}
    */
 
@@ -436,7 +439,7 @@
 
     // Empty / whitespace-only strings are considered finite so we need to check
     // the length of the trimmed string as well
-    if (trimmedValue.length > 0 && isFinite(trimmedValue)) {
+    if (trimmedValue.length > 0 && isFinite(Number(trimmedValue))) {
       return Number(trimmedValue)
     }
 
@@ -452,6 +455,7 @@
    * @returns {Object<string, unknown>} Normalised dataset
    */
   function normaliseDataset (dataset) {
+    /** @type {Object<string, unknown>} */
     var out = {};
 
     for (var key in dataset) {
@@ -735,15 +739,21 @@
    * Notification Banner component
    *
    * @class
-   * @param {HTMLElement} $module - HTML element to use for notification banner
+   * @param {Element} $module - HTML element to use for notification banner
    * @param {NotificationBannerConfig} [config] - Notification banner config
    */
   function NotificationBanner ($module, config) {
+    if (!($module instanceof HTMLElement)) {
+      return this
+    }
+
     this.$module = $module;
 
     var defaultConfig = {
       disableAutoFocus: false
     };
+
+    /** @type {NotificationBannerConfig} */
     this.config = mergeConfigs(
       defaultConfig,
       config || {},
@@ -755,9 +765,8 @@
    * Initialise component
    */
   NotificationBanner.prototype.init = function () {
-    var $module = this.$module;
-    // Check for module
-    if (!$module) {
+    // Check that required elements are present
+    if (!this.$module) {
       return
     }
 
@@ -803,11 +812,10 @@
    * Notification banner config
    *
    * @typedef {object} NotificationBannerConfig
-   * @property {boolean} [disableAutoFocus = false] -
-   *   If set to `true` the notification banner will not be focussed when the page
-   *   loads. This only applies if the component has a `role` of `alert` – in
-   *   other cases the component will not be focused on page load, regardless of
-   *   this option.
+   * @property {boolean} [disableAutoFocus = false] - If set to `true` the
+   *   notification banner will not be focussed when the page loads. This only
+   *   applies if the component has a `role` of `alert` – in other cases the
+   *   component will not be focused on page load, regardless of this option.
    */
 
   return NotificationBanner;

@@ -19,8 +19,9 @@
    * This seems to fail in IE8, requires more investigation.
    * See: https://github.com/imagitama/nodelist-foreach-polyfill
    *
-   * @param {NodeListOf<Element>} nodes - NodeList from querySelectorAll()
-   * @param {nodeListIterator} callback - Callback function to run for each node
+   * @template {Node} ElementType
+   * @param {NodeListOf<ElementType>} nodes - NodeList from querySelectorAll()
+   * @param {nodeListIterator<ElementType>} callback - Callback function to run for each node
    * @returns {void}
    */
   function nodeListForEach (nodes, callback) {
@@ -33,10 +34,11 @@
   }
 
   /**
+   * @template {Node} ElementType
    * @callback nodeListIterator
-   * @param {Element} value - The current node being iterated on
+   * @param {ElementType} value - The current node being iterated on
    * @param {number} index - The current index in the iteration
-   * @param {NodeListOf<Element>} nodes - NodeList from querySelectorAll()
+   * @param {NodeListOf<ElementType>} nodes - NodeList from querySelectorAll()
    * @returns {void}
    */
 
@@ -1056,11 +1058,20 @@
    * Radios component
    *
    * @class
-   * @param {HTMLElement} $module - HTML element to use for radios
+   * @param {Element} $module - HTML element to use for radios
    */
   function Radios ($module) {
+    if (!($module instanceof HTMLElement)) {
+      return this
+    }
+
+    var $inputs = $module.querySelectorAll('input[type="radio"]');
+    if (!$inputs.length) {
+      return this
+    }
+
     this.$module = $module;
-    this.$inputs = $module.querySelectorAll('input[type="radio"]');
+    this.$inputs = $inputs;
   }
 
   /**
@@ -1078,6 +1089,11 @@
    * the reveal in sync with the radio state.
    */
   Radios.prototype.init = function () {
+    // Check that required elements are present
+    if (!this.$module || !this.$inputs) {
+      return
+    }
+
     var $module = this.$module;
     var $inputs = this.$inputs;
 
@@ -1100,11 +1116,10 @@
     // state of form controls is not restored until *after* the DOMContentLoaded
     // event is fired, so we need to sync after the pageshow event in browsers
     // that support it.
-    if ('onpageshow' in window) {
-      window.addEventListener('pageshow', this.syncAllConditionalReveals.bind(this));
-    } else {
-      window.addEventListener('DOMContentLoaded', this.syncAllConditionalReveals.bind(this));
-    }
+    window.addEventListener(
+      'onpageshow' in window ? 'pageshow' : 'DOMContentLoaded',
+      this.syncAllConditionalReveals.bind(this)
+    );
 
     // Although we've set up handlers to sync state on the pageshow or
     // DOMContentLoaded event, init could be called after those events have fired,
@@ -1131,12 +1146,16 @@
    * @param {HTMLInputElement} $input - Radio input
    */
   Radios.prototype.syncConditionalRevealWithInputState = function ($input) {
-    var $target = document.getElementById($input.getAttribute('aria-controls'));
+    var targetId = $input.getAttribute('aria-controls');
+    if (!targetId) {
+      return
+    }
 
+    var $target = document.getElementById(targetId);
     if ($target && $target.classList.contains('govuk-radios__conditional')) {
       var inputIsChecked = $input.checked;
 
-      $input.setAttribute('aria-expanded', inputIsChecked);
+      $input.setAttribute('aria-expanded', inputIsChecked.toString());
       $target.classList.toggle('govuk-radios__conditional--hidden', !inputIsChecked);
     }
   };
@@ -1152,10 +1171,11 @@
    * @param {MouseEvent} event - Click event
    */
   Radios.prototype.handleClick = function (event) {
+    var $component = this;
     var $clickedInput = event.target;
 
     // Ignore clicks on things that aren't radio buttons
-    if ($clickedInput.type !== 'radio') {
+    if (!($clickedInput instanceof HTMLInputElement) || $clickedInput.type !== 'radio') {
       return
     }
 
@@ -1163,14 +1183,17 @@
     // aria-controls attributes.
     var $allInputs = document.querySelectorAll('input[type="radio"][aria-controls]');
 
+    var $clickedInputForm = $clickedInput.form;
+    var $clickedInputName = $clickedInput.name;
+
     nodeListForEach($allInputs, function ($input) {
-      var hasSameFormOwner = ($input.form === $clickedInput.form);
-      var hasSameName = ($input.name === $clickedInput.name);
+      var hasSameFormOwner = $input.form === $clickedInputForm;
+      var hasSameName = $input.name === $clickedInputName;
 
       if (hasSameName && hasSameFormOwner) {
-        this.syncConditionalRevealWithInputState($input);
+        $component.syncConditionalRevealWithInputState($input);
       }
-    }.bind(this));
+    });
   };
 
   return Radios;

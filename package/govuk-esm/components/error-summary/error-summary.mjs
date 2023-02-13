@@ -12,7 +12,7 @@ import '../../vendor/polyfills/Function/prototype/bind.mjs'
  * Takes focus on initialisation for accessible announcement, unless disabled in configuration.
  *
  * @class
- * @param {HTMLElement} $module - HTML element to use for error summary
+ * @param {Element} $module - HTML element to use for error summary
  * @param {ErrorSummaryConfig} [config] - Error summary config
  */
 function ErrorSummary ($module, config) {
@@ -23,7 +23,7 @@ function ErrorSummary ($module, config) {
   // To avoid breaking further JavaScript initialisation
   // we need to safeguard against this so things keep
   // working the same now we read the elements data attributes
-  if (!$module) {
+  if (!($module instanceof HTMLElement)) {
     // Little safety in case code gets ported as-is
     // into and ES6 class constructor, where the return value matters
     return this
@@ -34,6 +34,8 @@ function ErrorSummary ($module, config) {
   var defaultConfig = {
     disableAutoFocus: false
   }
+
+  /** @type {ErrorSummaryConfig} */
   this.config = mergeConfigs(
     defaultConfig,
     config || {},
@@ -45,10 +47,12 @@ function ErrorSummary ($module, config) {
  * Initialise component
  */
 ErrorSummary.prototype.init = function () {
-  var $module = this.$module
-  if (!$module) {
+  // Check that required elements are present
+  if (!this.$module) {
     return
   }
+
+  var $module = this.$module
 
   this.setFocus()
   $module.addEventListener('click', this.handleClick.bind(this))
@@ -107,11 +111,15 @@ ErrorSummary.prototype.handleClick = function (event) {
  */
 ErrorSummary.prototype.focusTarget = function ($target) {
   // If the element that was clicked was not a link, return early
-  if ($target.tagName !== 'A' || $target.href === false) {
+  if (!($target instanceof HTMLAnchorElement)) {
     return false
   }
 
   var inputId = this.getFragmentFromUrl($target.href)
+  if (!inputId) {
+    return false
+  }
+
   var $input = document.getElementById(inputId)
   if (!$input) {
     return false
@@ -138,11 +146,11 @@ ErrorSummary.prototype.focusTarget = function ($target) {
  * the hash.
  *
  * @param {string} url - URL
- * @returns {string} Fragment from URL, without the hash
+ * @returns {string | undefined} Fragment from URL, without the hash
  */
 ErrorSummary.prototype.getFragmentFromUrl = function (url) {
   if (url.indexOf('#') === -1) {
-    return false
+    return undefined
   }
 
   return url.split('#').pop()
@@ -159,9 +167,9 @@ ErrorSummary.prototype.getFragmentFromUrl = function (url) {
  * - The first `<label>` that is associated with the input using for="inputId"
  * - The closest parent `<label>`
  *
- * @param {HTMLElement} $input - The input
- * @returns {HTMLElement} Associated legend or label, or null if no associated
- *                        legend or label can be found
+ * @param {Element} $input - The input
+ * @returns {Element | null} Associated legend or label, or null if no associated
+ *   legend or label can be found
  */
 ErrorSummary.prototype.getAssociatedLegendOrLabel = function ($input) {
   var $fieldset = $input.closest('fieldset')
@@ -174,7 +182,7 @@ ErrorSummary.prototype.getAssociatedLegendOrLabel = function ($input) {
 
       // If the input type is radio or checkbox, always use the legend if there
       // is one.
-      if ($input.type === 'checkbox' || $input.type === 'radio') {
+      if ($input instanceof HTMLInputElement && ($input.type === 'checkbox' || $input.type === 'radio')) {
         return $candidateLegend
       }
 
@@ -209,6 +217,6 @@ export default ErrorSummary
  * Error summary config
  *
  * @typedef {object} ErrorSummaryConfig
- * @property {boolean} [disableAutoFocus = false] -
- *  If set to `true` the error summary will not be focussed when the page loads.
+ * @property {boolean} [disableAutoFocus = false] - If set to `true` the error
+ *   summary will not be focussed when the page loads.
  */
