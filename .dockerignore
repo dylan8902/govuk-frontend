@@ -1,26 +1,2 @@
-# Exclude everything:
-#
-*
-
-# Now un-exclude required files:
-#
-!app
-!config
-!lib
-!src
-!tasks
-!.browserslistrc
-!.eslitrc.js
-.lintstagedrc.js
-!.npmrc
-!babel.config.js
-!gulpfile.mjs
-!jest-puppeteer.config.js
-!jest.config.mjs
-!jsdoc.config.js
-!package.json
-!postcss.config.js
-!postcss.config.unit.test.js
-!puppeteer.config.js
-!sassdoc.config.yaml
-!stylelint.config.js
+node_modules
+.cache
